@@ -55,3 +55,45 @@ def create_task(site_id: int, task: schemas.TaskCreate, db: Session = Depends(ge
 @app.get("/job-sites/{site_id}/tasks", response_model=list[schemas.TaskResponse])
 def get_tasks(site_id: int, db: Session = Depends(get_db), current_user: dict = Depends(auth.get_current_user)):
     return db.query(models.Task).filter(models.Task.job_site_id == site_id).all()
+
+@app.put("/job-sites/{site_id}", response_model=schemas.JobSiteResponse)
+def update_job_site(site_id: int, job_site: schemas.JobSiteCreate, db: Session = Depends(get_db), current_user: dict = Depends(auth.get_current_user)):
+    site = db.query(models.JobSite).filter(models.JobSite.id == site_id).first()
+    if not site:
+        raise HTTPException(status_code=404, detail="Job site not found")
+    site.name = job_site.name
+    site.location = job_site.location
+    site.status = job_site.status
+    db.commit()
+    db.refresh(site)
+    return site
+
+@app.delete("/job-sites/{site_id}")
+def delete_job_site(site_id: int, db: Session = Depends(get_db), current_user: dict = Depends(auth.get_current_user)):
+    site = db.query(models.JobSite).filter(models.JobSite.id == site_id).first()
+    if not site:
+        raise HTTPException(status_code=404, detail="Job site not found")
+    db.delete(site)
+    db.commit()
+    return {"message": "Job site deleted"}
+
+@app.put("/job-sites/{site_id}/tasks/{task_id}", response_model=schemas.TaskResponse)
+def update_task(site_id: int, task_id: int, task: schemas.TaskCreate, db: Session = Depends(get_db), current_user: dict = Depends(auth.get_current_user)):
+    existing_task = db.query(models.Task).filter(models.Task.id == task_id, models.Task.job_site_id == site_id).first()
+    if not existing_task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    existing_task.title = task.title
+    existing_task.description = task.description
+    existing_task.status = task.status
+    db.commit()
+    db.refresh(existing_task)
+    return existing_task
+
+@app.delete("/job-sites/{site_id}/tasks/{task_id}")
+def delete_task(site_id: int, task_id: int, db: Session = Depends(get_db), current_user: dict = Depends(auth.get_current_user)):
+    task = db.query(models.Task).filter(models.Task.id == task_id, models.Task.job_site_id == site_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    db.delete(task)
+    db.commit()
+    return {"message": "Task deleted"}
