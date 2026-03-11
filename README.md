@@ -2,6 +2,10 @@
 
 A job site management API built with FastAPI and PostgreSQL. Designed to help construction companies track job sites, manage tasks, and coordinate workers in real time.
 
+## Live API
+https://sitesync-wrjy.onrender.com/docs
+```
+
 ## Features
 
 - User registration and authentication with JWT tokens
