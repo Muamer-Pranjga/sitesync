@@ -6,6 +6,10 @@ A job site management API built with FastAPI and PostgreSQL. Designed to help co
 https://sitesync-wrjy.onrender.com/docs
 ```
 
+## Live App
+https://sitesync-app.netlify.app
+```
+
 ## Features
 
 - User registration and authentication with JWT tokens
